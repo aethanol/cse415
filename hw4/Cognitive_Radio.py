@@ -43,8 +43,8 @@ class State:
         self.b = beam_position
 
     def __eq__(self, s2):
-        for i, v in enumerate(s2.d):
-            for j, v2 in enumerate(v):
+        for i in range(INITIAL_STATE_SIZE):
+            for j in range(6):
                 if s2.d[i][j] != self.d[i][j]:
                     return False
         return True
@@ -61,9 +61,8 @@ class State:
     def __str__(self):
         str = '\n'.join([''.join(['{:4}'.format(item) for item in row])
                          for row in self.d])
-        str += "\ncurrent position: %s \n beam position: %s \n total radios: %s \n known radios %s \n" % (self.p, self.b, self.r, self.kr)
+        str += "\n current position: %s \n beam position: %s \n total radios: %s \n known radios %s \n" % (self.p, self.b, self.r, self.kr)
         return str
-        #str += "current position: " + str(self.p) + "\n" + "beam position: " + self.b + "\n" +"total radios: " + self.r + "\n" + "known radios: " + self.kr + "\n"
 
     def search(self, x, y):
         news = self.__copy__()  # start with a deep copy
