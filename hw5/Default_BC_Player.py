@@ -1,6 +1,5 @@
-'''PlayerSkeletonA.py
-The beginnings of an agent that might someday play Baroque Chess.
-
+'''Default.py
+A baroque chess player implemented by Ethan Anderson and Bartholomew Olson
 '''
 
 import BC_state_etc as BC
@@ -26,12 +25,28 @@ def makeMove(currentState, currentRemark, timelimit):
     return [[move, newState], newRemark]
 
 def nickname():
-    return "Newman"
+    return "Default"
 
 def introduce():
-    return "I'm Newman Barry, a newbie Baroque Chess agent."
+    return "I'm Default, a default Baroque Chess agent."
 
 def prepare(player2Nickname):
+    
     pass
+
+class Operator:
+    def __init__(self, name, precond, state_transf):
+        self.name = name
+        self.precond = precond
+        self.state_transf = state_transf
+
+    def is_applicable(self, s):
+        return self.precond(s)
+
+    def apply(self, s):
+        return self.state_transf(s)
+
+
+
 
 
