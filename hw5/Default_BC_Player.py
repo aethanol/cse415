@@ -84,6 +84,38 @@ def makeMove(currentState, currentRemark, timelimit):
 
         return [[move, newState], newRemark]
 
+def rank_move(active_piece, previous_state, new_state):
+    #rank from -10 to 10 any state for an active piece and it's move
+
+    #-10 is a king capture
+    #-5 is a minor piece capture
+    #0 does nothing as far as we can see
+    #5 is a minor piece capture
+    #10 is a king capture
+
+    #Pincher
+    #if we can move next to a piece that has a pincher on the opposite side, this ranks 5+
+
+    #Withdrawer
+    #if an enemy piece is directly adjacent at the start of the move, this ranks 5+
+
+    #Leaper
+    #if an enemy piece is directly adjacent at the start of the move, this ranks 5+
+
+    #Coordinator
+    #if the friendly king makes a square whose corners cover an enemy piece, this ranks 5+
+
+    #Freezer
+    #if an enemy is directly adjacent at the start of the turn, this ranks 0-2
+    #if a higher value enemy is within reach, and won't get the freezer eaten, this ranks 3-5
+
+    #Imitator
+    #Depends on the adjacent piece's abilities, i.e. withdrawer or leaper, w/e
+
+    #King
+    #if an enemy is directly adjacent, this ranks 5+
+    #unless it'll get the king killed
+
 def make_new_board_state(move, previous_state):
     #Move the piece using previous_state and move
     #DOES NOT HANDLE CAPTURES YET
