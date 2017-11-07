@@ -1,6 +1,9 @@
 '''Default.py
 A baroque chess player implemented by Ethan Anderson and Bartholomew Olson
 '''
+#  7  0  1   UL U UR    -9  -8  -7
+#  6     2   L     R    -1      +1
+#  5  4  3   DL D DR    +7  +8  +9
 
 import BC_state_etc as BC
 
@@ -26,14 +29,14 @@ def makeMove(currentState, currentRemark, timelimit):
     #I didn't write parse, I think it makes a square
     first_state = parse(currentState)
 
-    #for through the first_state array, check for my pieces and their legal moves
+    #'for' through the first_state array, check for my pieces and their legal moves
     for piece_location in range(len(first_state)):
         #Find all wall blockers
         blockers = find_wall_blockers(piece_location)
-        [piece, myPiece, warriorClass] = checkForMyPiece(initialState[idx])
+        [piece, myPiece, warrior_class] = checkForMyPiece(initialState[idx])
         if piece:
             if myPiece:
-                legal_moves = find_moves(first_state, piece_location, warriorClass, blockers)
+                legal_moves = find_moves(first_state, piece_location, warrior_class, blockers)
                 for idx in range(len(legal_moves)):
                     first_state_moves.append(legal_moves[idx])
     #Check time!
@@ -43,10 +46,10 @@ def makeMove(currentState, currentRemark, timelimit):
     second_state = make_new_board_state(move, first_state)
     for piece_location in range(len(second_state)):
         blockers = find_wall_blockers(piece_location)
-        [piece, theirPiece, warriorClass] = checkForTheirPiece
+        [piece, theirPiece, warrior_class] = checkForTheirPiece
         if piece:
             if theirPiece:
-                legal_moves = find_moves(second_state, piece_location, warriorClass, blockers)
+                legal_moves = find_moves(second_state, piece_location, warrior_class, blockers)
                 for idx in range(len(legal_moves)):
                     second_state_moves.append(legal_moves[idx])
     #Check time!
@@ -56,10 +59,10 @@ def makeMove(currentState, currentRemark, timelimit):
     third_state - make_new_board_state(move, second_state)
     for piece_location in range(len(third_state)):
         blockers - find_wall_blockers(piece_location)
-        [piece, myPiece, warriorClass] = checkForMyPiece
+        [piece, myPiece, warrior_class] = checkForMyPiece
         if piece:
             if myPiece:
-                legal_moves = find_moves(third_state, piece_location, warriorClass, blockers)
+                legal_moves = find_moves(third_state, piece_location, warrior_class, blockers)
                 for idx in range(len(legal_moves)):
                     third_state_moves.append(legal_moves[idx])
     #Check time!
@@ -83,6 +86,74 @@ def makeMove(currentState, currentRemark, timelimit):
         newRemark = "I'll think harder in some future game. Here's my move"
 
         return [[move, newState], newRemark]
+
+#returns a list of lists containing:
+#adjacent enemy locations
+#enemy class (king, freezer, etc)
+#and direction from the friendly piece
+#Still need to determine whether we're upper or lower case
+def find_adjacent_enemy(new_state, move):
+    enemy_list = ['p', 'c', 'k', 'f', 'l', 'i', 'w']
+    friendly_list = ['P', 'C', 'K', 'F', 'L', 'I', 'W']
+    adjacent_enemy = []
+    enemy_class = []
+    enemy_direction = []
+    #Up
+    if new_state[move[1]-8] in enemy_list:
+        adjacent_enemy.append(move[1]-8)
+        enemy_class.append(new_state[move[1]-8])
+        enemy_direction.append('U')
+    #Up-Right
+    elif new_state[move[1]-7] in enemy_list:
+        adjacent_enemy.append(move[1]-7)
+        enemy_class.append(new_state[move[1]-7])
+        enemy_direction.append('UR')
+    #Right
+    elif new_state[move[1]+1] in enemy_list:
+        adjacent_enemy.append(move[1]+1)
+        enemy_class.append(new_state[move[1]+1])
+        enemy_direction.append('R')
+    #Down-Right
+    elif new_state[move[1]+9] in enemy_list:
+        adjacent_enemy.append(move[1]+9)
+        enemy_class.append(new_state[move[1]+9])
+        enemy_direction.append('DR')
+    #Down
+    elif new_state[move[1]+8] in enemy_list:
+        adjacent_enemy.append(move[1]+8)
+        enemy_class.append(new_state[move[1]+8])
+        enemy_direction.append('D')
+    #Down-Left
+    elif new_state[move[1]+7] in enemy_list:
+        adjacent_enemy.append(move[1]+7)
+        enemy_class.append(new_state[move[1]+7])
+        enemy_direction.append('DL')
+    #Left
+    elif new_state[move[1]-1] in enemy_list:
+        adjacent_enemy.append(move[1]-1)
+        enemy_class.append(new_state[move[1]-1])
+        enemy_direction.append('L')
+    #Up-Left
+    elif new_state[move[1]-9] in enemy_list:
+        adjacent_enemy.append(move[1]-9)
+        enemy_class.append(new_state[move[1]-9])
+        enemy_direction.append('UL')
+
+    local_info = [adjacent_enemy, enemy_class, enemy_direction]
+
+    return(local_info)
+
+def move_captures(new_state, previous_state, move, warrior_class):
+    local_info = find_adjacent_enemy(new_state, move)
+    adjacent_enemy = local_info[0]
+    enemy_class = local_info[1]
+    enemy_direction = local_info[2]
+
+    if warrior_class == 'p':
+        if adjacent_enemy:
+            for idx in range(len(adjacent_enemy)):
+                
+
 
 def rank_move(active_piece, previous_state, new_state):
     #rank from -10 to 10 any state for an active piece and it's move
@@ -125,9 +196,9 @@ def make_new_board_state(move, previous_state):
 
 #Finds and returns any blockers due to the edge of the board
 def find_wall_blockers(piece_location):
-#7 0 1   UL U UR
-#6   2   L     R
-#5 4 3   DL D DR
+#  7  0  1   UL U UR    -9  -8  -7
+#  6     2   L     R    -1      +1
+#  5  4  3   DL D DR    +7  +8  +9
     blockers = {'up_blocker' : 0
                 'up_right_blocker' : 0
                 'right_blocker' : 0
@@ -164,10 +235,10 @@ def find_wall_blockers(piece_location):
     return blockers
 
 #Finds and returns a list of legal moves
-def find_moves(current_state, piece_location, warriorClass, blockers):
+def find_moves(current_state, piece_location, warrior_class, blockers):
     wall_list = [0, 1, 2, 3, 4, 5, 6, 7, 15, 23, 31, 39, 47, 55, 63, 62, 61, 60, 59, 58, 57, 56, 48, 40, 32, 24, 16, 8]
     #Find moves for Pincer
-    if warriorClass == 'p':
+    if warrior_class == 'p':
         for idx in range(7):
             #check for moves up
             if blockers[0] == 0:
@@ -205,8 +276,8 @@ def find_moves(current_state, piece_location, warriorClass, blockers):
                         blockers[6] = 1
                 else:
                      blockers[6] = 1
-    #Find moves for King
-    elif warriorclass == 'k':
+    #Find moves for King TODO This doesn't consider optional captures for the king
+    elif warrior_class == 'k':
         #Up
         if blockers[0] == 0:
             if current_state[piece_location - 8] == 0:
@@ -327,8 +398,8 @@ def find_moves(current_state, piece_location, warriorClass, blockers):
             myPiece = 1
         else:
             myPiece = 0
-        warriorClass = slot
-        return [piece, myPiece, warriorClass]
+        warrior_class = slot
+        return [piece, myPiece, warrior_class]
 
     #Assumes their pieces are lower case
     def checkForTheirPiece(slot):
@@ -340,8 +411,8 @@ def find_moves(current_state, piece_location, warriorClass, blockers):
             theirPiece = 1
         else:
             theirPiece = 0
-        warriorClass = slot
-        return [piece, myPiece, warriorClass]
+        warrior_class = slot
+        return [piece, myPiece, warrior_class]
 
 
 
