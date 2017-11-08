@@ -6,86 +6,142 @@ A baroque chess player implemented by Ethan Anderson and Bartholomew Olson
 #  5  4  3   DL D DR    +7  +8  +9
 
 import BC_state_etc as BC
-
+import time
 def makeMove(currentState, currentRemark, timelimit):
+    # # Compute the new state for a move.
+    # # This is a placeholder that just copies the current state.
+    # newState = BC.BC_state(currentState.board)
+    #
+    # # Fix up whose turn it will be.
+    # newState.whose_move = 1 - currentState.whose_move
+    #
+    # # Construct a representation of the move that goes from the
+    # # currentState to the newState.
+    # # Here is a placeholder in the right format but with made-up
+    # # numbers:
+    # move = ((6, 4), (3, 4))
+    #
+    # # Make up a new remark
+    # newRemark = "I'll think harder in some future game. Here's my move"
+    #
+    # return [[move, newState], newRemark]
 
-    first_state = []
-    second_state = []
-    third_state = []
-    fourth_state = []
-    fifth_state = []
 
-    first_state_moves = []
-    second_state_moves = []
-    third_state_moves = []
-    fourth_state_moves = []
-    fifth_state_moves = []
+    root = currentState
+    max_depth = 5
+    remaining = timelimit
+    start_time = time.time()
 
-    best_move = []
+    for depth in range(1, max_depth):
+        # find how much time we have left, but give it a few seconds to finish the
+        # computation of the best possible movie and return
+        elapsed_time = time.time() - start_time
+        remaining -= elapsed_time
+        if remaining < timelimit + 2:
+            break
 
-    #mark start time
 
-    #put the board into a 1D array, should be 64 long
-    #I didn't write parse, I think it makes a square
-    first_state = parse(currentState)
 
-    #'for' through the first_state array, check for my pieces and their legal moves
-    for piece_location in range(len(first_state)):
-        #Find all wall blockers
-        blockers = find_wall_blockers(piece_location)
-        [piece, myPiece, warrior_class] = checkForMyPiece(initialState[idx])
-        if piece:
-            if myPiece:
-                legal_moves = find_moves(first_state, piece_location, warrior_class, blockers)
-                for idx in range(len(legal_moves)):
-                    first_state_moves.append(legal_moves[idx])
+
+import sys
+import time
+def timeout(func, args=(), kwargs={}, timeout_duration=1, default=None):
+    '''This function will spawn a thread and run the given function using the args, kwargs and
+    return the given default value if the timeout_duration is exceeded
+    '''
+    import threading
+    class PlayerThread(threading.Thread):
+        def __init__(self):
+            threading.Thread.__init__(self)
+            self.result = default
+
+        def run(self):
+            try:
+                self.result = func(*args, **kwargs)
+            except Exception as e:
+                print(sys.exc_info())
+                self.result = default
+
+    pt = PlayerThread()
+    pt.start()
+    started_at = time.time()
+    pt.join(timeout_duration)
+    ended_at = time.time()
+    diff = ended_at - started_at
+    print("Time used in makeMove: %0.4f seconds out of " % diff, timeout_duration)
+    if pt.isAlive():
+       pass
+    else:
+        # print("Within the time limit -- nice!")
+        return pt.result
+
+
+
+
+
+
+
+
+
+
+    # first_state = []
+    # second_state = []
+    # third_state = []
+    # fourth_state = []
+    # fifth_state = []
+    #
+    # first_state_moves = []
+    # second_state_moves = []
+    # third_state_moves = []
+    # fourth_state_moves = []
+    # fifth_state_moves = []
+    #
+    # best_move = []
+    #
+    # #mark start time
+    #
+    # #put the board into a 1D array, should be 64 long
+    # #I didn't write parse, I think it makes a square
+    # first_state = parse(currentState)
+    #
+    # #'for' through the first_state array, check for my pieces and their legal moves
+    # for piece_location in range(len(first_state)):
+    #     #Find all wall blockers
+    #     blockers = find_wall_blockers(piece_location)
+    #     [piece, myPiece, warrior_class] = checkForMyPiece(initialState[idx])
+    #     if piece:
+    #         if myPiece:
+    #             legal_moves = find_moves(first_state, piece_location, warrior_class, blockers)
+    #             for idx in range(len(legal_moves)):
+    #                 first_state_moves.append(legal_moves[idx])
+    # #Check time!
+    #
+    # #now take each move and turn it into a new board state
+    # #Then find all possible moves from there
+    # second_state = make_new_board_state(move, first_state)
+    # for piece_location in range(len(second_state)):
+    #     blockers = find_wall_blockers(piece_location)
+    #     [piece, theirPiece, warrior_class] = checkForTheirPiece
+    #     if piece:
+    #         if theirPiece:
+    #             legal_moves = find_moves(second_state, piece_location, warrior_class, blockers)
+    #             for idx in range(len(legal_moves)):
+    #                 second_state_moves.append(legal_moves[idx])
+    # #Check time!
+    #
+    # #now take each move and turn it into a new board state
+    # #Then find all possible moves from there
+    # third_state - make_new_board_state(move, second_state)
+    # for piece_location in range(len(third_state)):
+    #     blockers - find_wall_blockers(piece_location)
+    #     [piece, myPiece, warrior_class] = checkForMyPiece
+    #     if piece:
+    #         if myPiece:
+    #             legal_moves = find_moves(third_state, piece_location, warrior_class, blockers)
+    #             for idx in range(len(legal_moves)):
+    #                 third_state_moves.append(legal_moves[idx])
     #Check time!
 
-    #now take each move and turn it into a new board state
-    #Then find all possible moves from there
-    second_state = make_new_board_state(move, first_state)
-    for piece_location in range(len(second_state)):
-        blockers = find_wall_blockers(piece_location)
-        [piece, theirPiece, warrior_class] = checkForTheirPiece
-        if piece:
-            if theirPiece:
-                legal_moves = find_moves(second_state, piece_location, warrior_class, blockers)
-                for idx in range(len(legal_moves)):
-                    second_state_moves.append(legal_moves[idx])
-    #Check time!
-
-    #now take each move and turn it into a new board state
-    #Then find all possible moves from there
-    third_state - make_new_board_state(move, second_state)
-    for piece_location in range(len(third_state)):
-        blockers - find_wall_blockers(piece_location)
-        [piece, myPiece, warrior_class] = checkForMyPiece
-        if piece:
-            if myPiece:
-                legal_moves = find_moves(third_state, piece_location, warrior_class, blockers)
-                for idx in range(len(legal_moves)):
-                    third_state_moves.append(legal_moves[idx])
-    #Check time!
-
-
-
-        # Compute the new state for a move.
-        # This is a placeholder that just copies the current state.
-        newState = BC.BC_state(currentState.board)
-
-        # Fix up whose turn it will be.
-        newState.whose_move = 1 - currentState.whose_move
-
-        # Construct a representation of the move that goes from the
-        # currentState to the newState.
-        # Here is a placeholder in the right format but with made-up
-        # numbers:
-        move = ((6, 4), (3, 4))
-
-        # Make up a new remark
-        newRemark = "I'll think harder in some future game. Here's my move"
-
-        return [[move, newState], newRemark]
 
 #returns a list of lists containing:
 #adjacent enemy locations
@@ -271,7 +327,7 @@ def find_moves(current_state, piece_location, warrior_class, blockers):
             if blockers[6] == 0:
                 left_move = piece_location - idx
                 if current_state[left_move] == 0:
-                    legal_moves.append9[piece_location, left_move])
+                    legal_moves.append([piece_location, left_move])
                     if left_move in wall_list:
                         blockers[6] = 1
                 else:
@@ -389,7 +445,7 @@ def find_moves(current_state, piece_location, warrior_class, blockers):
     return legal_moves
 
     #Assumes my pieces are upper case
-    def checkForMyPiece(slot):
+def checkForMyPiece(slot):
         if slot != 0:
             piece = 1
         elif slot == 0:
@@ -402,7 +458,7 @@ def find_moves(current_state, piece_location, warrior_class, blockers):
         return [piece, myPiece, warrior_class]
 
     #Assumes their pieces are lower case
-    def checkForTheirPiece(slot):
+def checkForTheirPiece(slot):
         if slot != 0:
             piece = 1
         elif slot == 0:
