@@ -163,6 +163,23 @@ def move_captures(new_state, previous_state, move, warrior_class):
     captured_piece = []
     captured_piece_class = []
 
+    if move[1] - move[0] == -8:
+        move_direction = 'U'
+    elif move[1] - move[0] == -7:
+        move_direction = 'UR'
+    elif move[1] - move[0] == 1:
+        move_direction = 'R'
+    elif move[1] - move[0] == 9:
+        move_direction = 'DR'
+    elif move[1] - move[0] == 8:
+        move_direction = 'D'
+    elif move[1] - move[0] == 7:
+        move_direction = 'DL'
+    elif move[1] - move[0] == -1:
+        move_direction = 'L'
+    elif move[1] - move[0] == -9:
+        move_direction = 'UL'
+
     #Captures for Pincher
     if warrior_class == 'p':
         if new_adjacent_enemy:
@@ -208,51 +225,41 @@ def move_captures(new_state, previous_state, move, warrior_class):
                         captured_piece.append(move[1]-9)
                         captured_piece_class.append(new_state[move[1]-9])
 
-        #Captures for Kings
-        if warrior_class == 'k':
-                #direction of move
-                if move[1] - move[0] == -8:
-                    move_direction = 'U'
-                elif move[1] - move[0] == -7:
-                    move_direction = 'UR'
-                elif move[1] - move[0] == 1:
-                    move_direction = 'R'
-                elif move[1] - move[0] == 9:
-                    move_direction = 'DR'
-                elif move[1] - move[0] == 8:
-                    move_direction = 'D'
-                elif move[1] - move[0] == 7:
-                    move_direction = 'DL'
-                elif move[1] - move[0] == -1:
-                    move_direction = 'L'
-                elif move[1] - move[0] == -9:
-                    move_direction = 'UL'
+        #Captures for Leaper TODO this is fucked up, leaper can't capture in any direction from where it lands, it has to be in the path already
+        if warrior_class == 'l':
+            for idx in range(len(new_adjacent_enemy)):
+                if new_enemy_direction[idx] == 'U':
+                    if new_adjacent_enemy[idx]-16 == ' ':
+                        move_captures = 1
+                        new_move[0] = move[0]
+                        new_move[1] =
+                if new_enemy_direction[idx] == 'UR':
+                    if new_adjacent_enemy[idx]-14 == ' ':
+                if new_enemy_direction[idx] == 'R':
+                    if new_adjacent_enemy[idx]+2 ' ':
+                if new_enemy_direction[idx] == 'DR':
+                    if new_adjacent_enemy[idx]+18 ' ':
+                if new_enemy_direction[idx] == 'D':
+                    if new_adjacent_enemy[idx]+16 ' ':
+                if new_enemy_direction[idx] == 'DL':
+                    if new_adjacent_enemy[idx]+14 == ' ':
+                if new_enemy_direction[idx] == 'L':
+                    if new_adjacent_enemy[idx]-2 == ' ':
+                if new_enemy_direction[idx] == 'UL':
+                    if new_adjacent_enemy[idx] == ' ':
 
-                if move_direction in old_adjacent_enemy:
-                    move_captures = 1
-                    captured_piece.append(move[1])
-                    captured_piece_class.append(previous_state[move[1]])
+
+
+
+        #Captures for King
+        if warrior_class == 'k':
+            if move_direction in old_enemy_direction:
+                move_captures = 1
+                captured_piece.append(move[1])
+                captured_piece_class.append(previous_state[move[1]])
 
         #Captures for Withdrawer
         if warrior_class == 'w':
-            #direction of move
-            if move[1] - move[0] == -8:
-                move_direction = 'U'
-            elif move[1] - move[0] == -7:
-                move_direction = 'UR'
-            elif move[1] - move[0] == 1:
-                move_direction = 'R'
-            elif move[1] - move[0] == 9:
-                move_direction = 'DR'
-            elif move[1] - move[0] == 8:
-                move_direction = 'D'
-            elif move[1] - move[0] == 7:
-                move_direction = 'DL'
-            elif move[1] - move[0] == -1:
-                move_direction = 'L'
-            elif move[1] - move[0] == -9:
-                move_direction = 'UL'
-
             #Checks for adjacent enemy in previous state, if found, and move is oppposite, it captures
             if move_direction == 'U' and 'D' in old_adjacent_enemy:
                 move_captures = 1
@@ -314,27 +321,108 @@ def move_captures(new_state, previous_state, move, warrior_class):
 
         #Captures for the Imitator
         if warrior_class == 'i':
-            #direction of move
-            if move[1] - move[0] == -8:
-                move_direction = 'U'
-            elif move[1] - move[0] == -7:
-                move_direction = 'UR'
-            elif move[1] - move[0] == 1:
-                move_direction = 'R'
-            elif move[1] - move[0] == 9:
-                move_direction = 'DR'
-            elif move[1] - move[0] == 8:
-                move_direction = 'D'
-            elif move[1] - move[0] == 7:
-                move_direction = 'DL'
-            elif move[1] - move[0] == -1:
-                move_direction = 'L'
-            elif move[1] - move[0] == -9:
-                move_direction = 'UL'
-            
+            if 'w' in old_adjacent_enemy:
+                for idx in range(len(old_adjacent_enemy)):
+                    if old_adjacent_enemy[idx] == 'w':
+                        withdrawer_grid_number = idx
+                withdrawer_location = old_enemy_direction[withdrawer_grid_number]
+                if move_direction == opposite(withdrawer_location):
+                    move_captures = 1
+                    captured_piece.append(old_adjacent_enemy[withdrawer_grid_number])
+                    captured_piece_class.append(previous_state[old_adjacent_enemy[withdrawer_grid_number]])
+            if 'p' in new_adjacent_enemy:
+                for idx in range(len(new_adjacent_enemy)):
+                    if new_enemy_direction[idx] == 'U':
+                        if new_state[move[1]-16] == 'p':
+                            move_captures = 1
+                            captured_piece.append(move[1]-8)
+                            captured_piece_class.append(new_state[move[1]-8])
+                    elif new_enemy_direction[idx] == 'UR'
+                        if new_state[move[1]-14] == 'p':
+                            move_captures = 1
+                            captured_piece.append(move[1]-7)
+                            captured_piece_class.append(new_state[move[1]-7])
+                    elif new_enemy_direction[idx] == 'R'
+                        if new_state[move[1]+2] == 'p':
+                            move_captures = 1
+                            captured_piece.append(move[1]+1)
+                            captured_piece_class.append(new_state[move[1]+1])
+                    elif new_enemy_direction[idx] == 'DR'
+                        if new_state[move[1]+18] == 'p':
+                            move_captures = 1
+                            captured_piece.append(move[1]+9)
+                            captured_piece_class.append(new_state[move[1]+9])
+                    elif new_enemy_direction[idx] == 'D'
+                        if new_state[move[1]+16] == 'p':
+                            move_captures = 1
+                            captured_piece.append(move[1]+8)
+                            captured_piece_class.append(new_state[move[1]+8])
+                    elif new_enemy_direction[idx] == 'DL'
+                        if new_state[move[1]+14] == 'p':
+                            move_captures = 1
+                            captured_piece.append(move[1]+7)
+                            captured_piece_class.append(new_state[move[1]+7)
+                    elif new_enemy_direction[idx] == 'L'
+                        if new_state[move[1]-2] == 'p':
+                            move_captures = 1
+                            captured_piece.append(move[1]-1)
+                            captured_piece_class.append(new_state[move[1]-1])
+                    elif new_enemy_direction[idx] == 'UL'
+                        if new_state[move[1]-18] == 'p':
+                            move_captures = 1
+                            captured_piece.append(move[1]-9)
+                            captured_piece_class.append(new_state[move[1]-9])
+
+            if 'c' in new_adjacent_enemy:
+                coordinator_x = move[1] % 8
+                coordinator_y = move[1] / 8
+                for idx in len(previous_state):
+                    if previous_state[idx] == 'k':
+                        king_location = idx
+                king_x = king_location % 8
+                king_y = king_location / 8
+
+                a_corner = coordinator_y * 8 + king_x
+                b_corner = king_y * 8 + coordinator_x
+
+                if previous_state[a_corner] in enemy_list:
+                    move_captures = 1
+                    captured_piece.append(a_corner)
+                    captured_piece_class.append(previous_state[a_corner])
+                if previous_state[b_corner] in enemy_list:
+                    move_captures = 1
+                    captured_piece.append(b_corner)
+                    captured_piece_class.append(previous_state[b_corner])
+
+            if 'k' in new_adjacent_enemy:
+                if warrior_class == 'k':
+                        if move_direction in old_adjacent_enemy:
+                            move_captures = 1
+                            captured_piece.append(move[1])
+                            captured_piece_class.append(previous_state[move[1]])
 
 
-    return(move_captures, captured_piece_location, captured_piece_class)
+
+    return(move_captures, captured_piece_location, captured_piece_class, new_move)
+
+def opposite(direction):
+    if direction == 'U':
+        opposite = 'D'
+    elif direction == 'UR':
+        opposite = 'DL'
+    elif direction == 'R':
+        opposite = 'L'
+    elif direction == 'DR':
+        opposite = 'UL'
+    elif direction == 'D':
+        opposite = 'U'
+    elif direction == 'DL':
+        opposite = 'UR'
+    elif direction == 'L':
+        opposite = 'R'
+    elif direction == 'UL':
+        opposite = 'DR'
+    return opposite
 
 def rank_move(active_piece, previous_state, new_state):
     #rank from -10 to 10 any state for an active piece and it's move
