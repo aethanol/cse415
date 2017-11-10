@@ -14,6 +14,20 @@ import math
 GameTree = defaultdict()
 BOARD_DIM = 8
 
+def zhash(state):
+    global zobristnum
+    val = 0
+    who = state.whose_move
+    board = state.board
+    for row_i, row_v in enumerate(board):
+        for col_i, col_v in enumerate(row_v):
+            piece = None
+            if(board[i] == 'B'): piece = 0
+            if(board[i] == 'W'): piece = 1
+            if(piece != None):
+                val ^= zobristnum[i][piece]
+    return val
+
 def makeMove(currentState, currentRemark, timelimit):
     # # Compute the new state for a move.
     # # This is a placeholder that just copies the current state.
@@ -35,7 +49,7 @@ def makeMove(currentState, currentRemark, timelimit):
 
 
     root = currentState
-    max_depth = 5
+    max_depth = 15
     remaining = timelimit
     start_time = time.time()
 
@@ -46,12 +60,18 @@ def makeMove(currentState, currentRemark, timelimit):
         remaining -= elapsed_time
         if remaining < timelimit + 2:
             break
+        timeout(minimax, args=([root, None], depth), kwargs={'whose_move': root.whose_move}, timeout_duration=remaining)
 
 
-# def minimax(state, depth, whose_move):
-#     if depth is 0:
-#         # TODO check the
-#     else:
+def minimax(state_val, depth, whose_move=None):
+
+    if depth is 0:
+        val = staticEval(state_val)
+        state_val[1] = val
+        return state_val
+    else:
+        for op in OPERATORS:
+
 
 
 def idfs(state, depth):
@@ -60,6 +80,38 @@ def idfs(state, depth):
     else:
         pass
     pass
+
+class Operator:
+    def __init__(self, name, precond, state_transf):
+        self.name = name
+        self.precond = precond
+        self.state_transf = state_transf
+
+    def is_applicable(self, s):
+        return self.precond(s)
+
+    def apply(self, s):
+        return self.state_transf(s)
+
+valid_positions = list(itertools.product(range(BOARD_DIM), range(BOARD_DIM)))  # board dim is 8
+# OPERATORS = []
+# for start, end in itertools.product(valid_positions, valid_positions):
+#
+
+OPERATORS = [
+    Operator("move from %s to %s", lambda s, start=start, end=end: can_move_whose(s, start, end), lambda s, start=start, end=end: move(s, start, end))
+    for start,end, in itertools.product(valid_positions, valid_positions)
+]
+
+def can_move_whose(state, start, end):
+    piece_s = to_piece(state, start)
+    piece_e = to_piece(state, end)
+    #check if the current player owns the piece TODO: decide where can_move is called from (static eval or not)
+    who = BC.who(BC.INIT_TO_CODE[piece_s])
+    if state.whose_move != who:
+        return False
+    else:
+        return can_move(state, start, end)
 
 
 #     p: pincer # moves like a rook (castle)
@@ -88,10 +140,9 @@ def can_move(state, start, end):
     if piece_e != '-':
         return False
 
-    # check if the current player owns the piece TODO: decide where can_move is called from (static eval or not)
-    # who = BC.who(BC.INIT_TO_CODE[piece])
-    # if state.whose_move != who:
-    #     return False
+    # check frozen
+    if is_frozen(state, start):
+        return False
     p_lower = piece_s.lower()
     if p_lower == 'p':
         return can_move_pincer(state, start, end)
@@ -107,8 +158,19 @@ def can_move(state, start, end):
 # returns the init value from a position on the board
 # position = [r, c]
 def to_piece(state, position):
-    return state.board[position[0]][position[1]]
+    return BC.CODE_TO_INIT[state.board[position[0]][position[1]]]
 
+
+def is_frozen(state, position):
+    who = 1 if state.whose_move == "WHITE" else 0
+
+    # get the adjacent pieces
+    adj = get_adj_pieces(state, position[1], position[0])
+    for piece in adj:
+        if BC.who(piece) != who and to_piece(state, position).lower() == 'f':
+            return True
+
+    return False
 
 def can_move_pincer(state, start, end):
     y_df = start[0] - end[0]
@@ -134,6 +196,7 @@ def can_move_leaper(state, start, end):
     return can_move_noble(state, start, end)
 
 def can_move_imitator(state, start, end):
+
     pass
 
 def can_move_king(state, start, end):
@@ -195,6 +258,13 @@ def can_move_orthogonal(state, start, end):
     else:
         return False
 
+# move moves a piece from start to end, will always be a valid move
+def move(state, start, end):
+    # make a copy of the state to return
+    new_state = BC.BC_state(old_board=state.board, whose_move=state.whose_move)
+
+
+    return new_state
 
 # Static eval performs a static evaluation of the given state.
 # The value returned is high if the state is good for WHITE
@@ -273,6 +343,7 @@ def introduce():
 
 def prepare(player2Nickname):
     pass
+
 
 
 
