@@ -123,8 +123,15 @@ def can_move_leaper(state, start, end):
     y_df = start[0] - end[0]
     x_df = start[1] - end[1]
     # check if the direction it is moving has a piece directly and can be leaped over
+    d_y = y_df / abs(y_df)
+    d_x = x_df / abs(x_df)
+    if state.board[start[0] + d_y][start[1] + d_x] != "-":
+        if state.board[start[0] + d_y * 2][start[1] + d_x * 2] == "-":
+            return True
+        return False
 
     # else move noble
+    return can_move_noble(state, start, end)
 
 def can_move_imitator(state, start, end):
     pass
